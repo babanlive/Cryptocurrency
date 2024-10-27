@@ -10,3 +10,23 @@ services:
       POSTGRES_PASSWORD: password
     ports:
       - "5432:5432"
+    network_mode: host
+
+  web:
+    build:
+      target: dev
+      context: .
+      dockerfile: ./Dockerfile
+    image: app/app_dev
+    container_name: app_fastapi
+    depends_on:
+      - pg
+    volumes:
+      - .:/app
+    env_file:
+      - ./fastapi-application/.env
+    working_dir: /app/fastapi-application
+    ports:
+      - 8000:8000
+    command: ["uvicorn", "main:main_app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    network_mode: host
