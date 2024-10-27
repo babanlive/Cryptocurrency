@@ -4,10 +4,13 @@ from pydantic import BaseModel, ConfigDict
 
 
 class PriceBase(BaseModel):
-    id: int
     ticker: str
     price: float
     timestamp: datetime
+
+
+class PriceCreate(PriceBase):
+    pass
 
 
 class PriceRead(PriceBase):
