@@ -21,7 +21,7 @@ class DatabaseConfig(BaseModel):
 
 class Settings(BaseSettings):
     model_config: SettingsConfigDict = SettingsConfigDict(
-        env_file='.env', case_sensitive=False, env_nested_delimiter='__', env_prefix='APP_CONFIG__'
+        env_file=('.env.example', '.env'), case_sensitive=False, env_nested_delimiter='__', env_prefix='APP_CONFIG__'
     )
     run: RunConfig = RunConfig()
     api: ApiPrefix = ApiPrefix()
