@@ -1,3 +1,5 @@
+import asyncio
+
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
@@ -7,12 +9,17 @@ from api.routers import router as api_router
 from core.config import settings
 from core.models import db_helper
 from fastapi import FastAPI
+from index_price import main as get_prices
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    yield
-    await db_helper.dispose()
+    task = asyncio.create_task(get_prices())
+    try:
+        yield
+    finally:
+        task.cancel()
+        await db_helper.dispose()
 
 
 main_app = FastAPI(lifespan=lifespan)
