@@ -36,14 +36,14 @@
 
     - Для запуска в режиме разработки выполните команду:
 
-      ```shell
-      docker-compose -f docker-compose.yaml up --build
-      ```
+    ```shell
+    poetry run docker compose -f docker-compose.yaml up --build
+    ```
 
 4. Выполните миграции:
 
     ```shell
-    docker exec -it app_fastapi poetry run alembic upgrade head
+    poetry run docker exec -it app_fastapi poetry run alembic upgrade head
     ```
 
 ## Работа с API
@@ -72,30 +72,36 @@ http://127.0.0.1:8000/docs
 ### Примеры запросов
 1. Получение всех сохранённых данных для тикера BTC_USD:
 
-```shell
-curl -X 'GET' \
-  'http://127.0.0.1:8000/api/v1/prices/tickers?ticker=BTC_USD' \
-  -H 'accept: application/json'
-  ```
+    ```shell
+      curl -X 'GET' \
+      'http://127.0.0.1:8000/api/v1/prices/tickers?ticker=BTC_USD' \
+      -H 'accept: application/json'
+    ```
 
 2. Получение последней цены для тикера ETH_USD:
-```shell
-curl -X 'GET' \
-  'http://127.0.0.1:8000/api/v1/prices/tickers/latest?ticker=ETH_USD' \
-  -H 'accept: application/json'
- ```
+    ```shell
+      curl -X 'GET' \
+      'http://127.0.0.1:8000/api/v1/prices/tickers/latest?ticker=ETH_USD' \
+      -H 'accept: application/json'
+    ```
 
 3. Получение цен для тикера BTC_USD с фильтром по дате:
 
-```shell
-curl -X 'GET' \
-  'http://127.0.0.1:8000/api/v1/prices/tickers/date?ticker=BTC_USD&date=2024-10-27' \
-  -H 'accept: application/json'
- ```
+    ```shell
+      curl -X 'GET' \
+      'http://127.0.0.1:8000/api/v1/prices/tickers/date?ticker=BTC_USD&date=2024-10-27' \
+      -H 'accept: application/json'
+    ```
 
 ## Тесты
-- Запуска тестов:
+1. Создайте тестовую БД
 
-```shell
-docker exec -it app_fastapi poetry run pytest tests/ --disable-warnings
-```
+    ```shell
+    poetry run docker exec -it pg_db psql -U user -d postgres -c "CREATE DATABASE test_db;"
+    ```
+
+2. Запустите тесты:
+
+    ```shell
+    poetry run docker exec -it app_fastapi poetry run pytest tests/ --disable-warnings
+    ```
