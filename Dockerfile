@@ -34,7 +34,7 @@
 
     COPY poetry.lock pyproject.toml ./
     RUN --mount=type=cache,target=/root/.cache \
-        poetry install --no-root --only main 
+        poetry install --no-root --only main
 
     COPY . ./
 
@@ -43,10 +43,11 @@
     ################################
     FROM builder-base as prod
     EXPOSE 8000
+
     ################################
     # DEVELOPMENT
     ################################
     FROM builder-base as dev
     RUN --mount=type=cache,target=/root/.cache \
-        poetry install --with dev
-    EXPOSE 8000
+        poetry install --no-root
+    EXPOSE 8000        
