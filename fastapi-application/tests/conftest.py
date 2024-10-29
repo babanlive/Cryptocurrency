@@ -1,7 +1,3 @@
-
-import asyncio
-import random
-
 from collections.abc import AsyncGenerator
 from datetime import UTC, datetime, timedelta
 
@@ -12,6 +8,7 @@ from core.models.db_helper import db_helper
 from core.schemas.prices import PriceCreate
 from crud import prices as crud_prices
 from httpx import AsyncClient
+from httpx._transports.asgi import ASGITransport
 from main import main_app
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
@@ -44,16 +41,9 @@ async def prepare_database():
 
 
 @pytest.fixture(scope='session')
-def event_loop():
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    yield loop
-    loop.close()
-
-
-@pytest.fixture(scope='session')
 async def ac() -> AsyncGenerator[AsyncClient, None]:
-    async with AsyncClient(app=main_app, base_url='http://127.0.0.1:8000') as ac:
+    transport = ASGITransport(app=main_app)
+    async with AsyncClient(transport=transport, base_url='http://127.0.0.1:8000') as ac:
         yield ac
 
 
@@ -77,7 +67,5 @@ async def add_price_data(async_session_fixture) -> AsyncGenerator[list[PriceCrea
 
         for price_data in prices_data:
             await crud_prices.add_price(session, price_data)
-        await session.commit()
 
         yield prices_data
-
