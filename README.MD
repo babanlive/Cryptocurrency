@@ -34,16 +34,16 @@
 
 3. Запустите проект через Docker:
 
-    - Для запуска в режиме разработки выполните команду:
+  - Для запуска в режиме разработки выполните команду:
 
     ```shell
-    poetry run docker compose -f docker-compose.yaml up --build
+    docker compose -f docker-compose.yaml up --build
     ```
 
 4. Выполните миграции:
 
     ```shell
-    poetry run docker exec -it app_fastapi poetry run alembic upgrade head
+    docker exec -it app_fastapi poetry run alembic upgrade head
     ```
 
 ## Работа с API
@@ -97,11 +97,11 @@ http://127.0.0.1:8000/docs
 1. Создайте тестовую БД
 
     ```shell
-    poetry run docker exec -it pg_db psql -U user -d postgres -c "CREATE DATABASE test_db;"
+    docker exec -it pg_db psql -U user -d postgres -c "CREATE DATABASE test_db;"
     ```
 
 2. Запустите тесты:
 
     ```shell
-    poetry run docker exec -it app_fastapi poetry run pytest tests/ --disable-warnings
+    docker exec -it app_fastapi poetry run pytest -v tests/ --disable-warnings
     ```
