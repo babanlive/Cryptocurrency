@@ -1,11 +1,16 @@
+
 import asyncio
+import random
 
 from collections.abc import AsyncGenerator
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
 from core.models.base import Base
 from core.models.db_helper import db_helper
+from core.schemas.prices import PriceCreate
+from crud import prices as crud_prices
 from httpx import AsyncClient
 from main import main_app
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
@@ -48,5 +53,31 @@ def event_loop():
 
 @pytest.fixture(scope='session')
 async def ac() -> AsyncGenerator[AsyncClient, None]:
-    async with AsyncClient(app=main_app, base_url='http://127.0.0.1:8000/api/v1/') as ac:
+    async with AsyncClient(app=main_app, base_url='http://127.0.0.1:8000') as ac:
         yield ac
+
+
+@pytest.fixture(scope='session')
+async def async_session_fixture() -> AsyncGenerator[AsyncSession, None]:
+    async with async_session_maker() as async_session:
+        yield async_session
+
+
+@pytest.fixture(scope='module')
+async def add_price_data(async_session_fixture) -> AsyncGenerator[list[PriceCreate], None]:
+    async with async_session_fixture as session:
+        prices_data = [
+            PriceCreate(ticker='BTC_USD', price=61300.34, timestamp=datetime.now(UTC)),
+            PriceCreate(ticker='ETH_USD', price=850.21, timestamp=datetime.now(UTC)),
+            PriceCreate(ticker='BTC_USD', price=61400.42, timestamp=datetime.now(UTC)),
+            PriceCreate(ticker='ETH_USD', price=860.37, timestamp=datetime.now(UTC)),
+            PriceCreate(ticker='BTC_USD', price=61500.96, timestamp=datetime.now(UTC) - timedelta(days=1)),
+            PriceCreate(ticker='ETH_USD', price=870.34, timestamp=datetime.now(UTC) - timedelta(days=1)),
+        ]
+
+        for price_data in prices_data:
+            await crud_prices.add_price(session, price_data)
+        await session.commit()
+
+        yield prices_data
+
